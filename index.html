@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>University Student Network</title>
+    <title>Campus Social - Connect & Share</title>
     <style>
         * {
             margin: 0;
@@ -13,499 +13,474 @@
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
+            background: #f0f2f5;
         }
 
-        .app-container {
-            display: flex;
-            height: 100vh;
-        }
-
-        /* Sidebar */
-        .sidebar {
-            width: 300px;
+        /* Top Navigation */
+        .top-nav {
             background: white;
-            box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            padding: 0.75rem 2rem;
             display: flex;
-            flex-direction: column;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 100;
         }
 
-        .sidebar-header {
-            padding: 1.5rem;
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .nav-center {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .nav-btn {
+            padding: 0.5rem 1.5rem;
+            border: none;
+            background: #f0f2f5;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            font-weight: 500;
+            transition: background 0.3s;
+        }
+
+        .nav-btn.active {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
         }
 
-        .sidebar-header h1 {
-            font-size: 1.3rem;
-            margin-bottom: 0.5rem;
-        }
-
-        .current-user {
+        .nav-right {
             display: flex;
             align-items: center;
-            gap: 0.75rem;
-            margin-top: 1rem;
-            padding: 0.75rem;
-            background: rgba(255,255,255,0.1);
-            border-radius: 0.5rem;
+            gap: 1rem;
         }
 
-        .current-user-avatar {
-            width: 50px;
-            height: 50px;
+        .user-avatar-nav {
+            width: 40px;
+            height: 40px;
             border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
             overflow: hidden;
-            background: white;
-            border: 2px solid white;
         }
 
-        .current-user-avatar img {
+        .user-avatar-nav img {
             width: 100%;
             height: 100%;
             object-fit: cover;
         }
 
-        .current-user-placeholder {
-            width: 100%;
-            height: 100%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.5rem;
-            color: #667eea;
-        }
-
-        .current-user-info h3 {
-            font-size: 0.9rem;
-            margin-bottom: 0.2rem;
-        }
-
-        .current-user-info p {
-            font-size: 0.75rem;
-            opacity: 0.8;
-        }
-
-        .nav-tabs {
-            display: flex;
-            border-bottom: 1px solid #e0e0e0;
-        }
-
-        .nav-tab {
-            flex: 1;
-            padding: 1rem;
-            background: none;
-            border: none;
-            cursor: pointer;
-            font-weight: 500;
-            color: #666;
-            transition: all 0.3s;
-            position: relative;
-        }
-
-        .nav-tab.active {
-            color: #667eea;
-        }
-
-        .nav-tab.active::after {
-            content: '';
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            height: 3px;
-            background: #667eea;
-        }
-
-        .tab-badge {
+        .notification-badge {
             background: #ef4444;
             color: white;
-            font-size: 0.7rem;
+            border-radius: 50%;
             padding: 0.2rem 0.5rem;
-            border-radius: 1rem;
-            margin-left: 0.5rem;
-        }
-
-        .sidebar-content {
-            flex: 1;
-            overflow-y: auto;
-            padding: 1rem;
-        }
-
-        .friend-item, .request-item {
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-            padding: 0.75rem;
-            border-radius: 0.5rem;
-            margin-bottom: 0.5rem;
-            cursor: pointer;
-            transition: background 0.2s;
-        }
-
-        .friend-item:hover {
-            background: #f5f5f5;
-        }
-
-        .friend-avatar {
-            width: 45px;
-            height: 45px;
-            border-radius: 50%;
-            overflow: hidden;
-            background: #f0f0f0;
-            flex-shrink: 0;
-        }
-
-        .friend-avatar img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-
-        .friend-avatar-placeholder {
-            width: 100%;
-            height: 100%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.5rem;
-            color: #667eea;
-        }
-
-        .friend-info {
-            flex: 1;
-        }
-
-        .friend-name {
-            font-weight: 600;
-            font-size: 0.9rem;
-            margin-bottom: 0.2rem;
-        }
-
-        .friend-status {
             font-size: 0.75rem;
-            color: #999;
+            font-weight: bold;
         }
 
-        .online-indicator {
-            width: 10px;
-            height: 10px;
-            background: #4ade80;
-            border-radius: 50%;
-            display: inline-block;
-            margin-right: 0.3rem;
-        }
-
-        .request-actions {
-            display: flex;
-            gap: 0.5rem;
-        }
-
-        .btn-accept, .btn-decline {
-            padding: 0.4rem 0.8rem;
-            border: none;
-            border-radius: 0.3rem;
-            cursor: pointer;
-            font-size: 0.8rem;
-            font-weight: 500;
-        }
-
-        .btn-accept {
-            background: #667eea;
-            color: white;
-        }
-
-        .btn-decline {
-            background: #e0e0e0;
-            color: #666;
-        }
-
-        /* Main Content */
-        .main-content {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .main-header {
-            background: white;
-            padding: 1.5rem 2rem;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-        }
-
-        .main-header h2 {
-            font-size: 1.8rem;
-            color: #333;
-            margin-bottom: 0.5rem;
-        }
-
-        .main-header p {
-            color: #666;
-        }
-
-        .content-area {
-            flex: 1;
-            overflow-y: auto;
-            padding: 2rem;
-        }
-
-        /* Student Cards Grid */
-        .students-grid {
+        /* Main Layout */
+        .main-container {
+            max-width: 1400px;
+            margin: 2rem auto;
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-            gap: 1.5rem;
+            grid-template-columns: 300px 1fr 300px;
+            gap: 2rem;
+            padding: 0 2rem;
         }
 
-        .student-card {
+        /* Left Sidebar */
+        .left-sidebar {
+            position: sticky;
+            top: 80px;
+            height: fit-content;
+        }
+
+        .profile-card {
             background: white;
             border-radius: 1rem;
             padding: 1.5rem;
             text-align: center;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-            transition: transform 0.3s, box-shadow 0.3s;
+            margin-bottom: 1rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
         }
 
-        .student-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
-        }
-
-        .student-avatar {
+        .profile-avatar {
             width: 100px;
             height: 100px;
             border-radius: 50%;
             margin: 0 auto 1rem;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 2.5rem;
             overflow: hidden;
-            background: #f0f0f0;
+            cursor: pointer;
         }
 
-        .student-avatar img {
+        .profile-avatar img {
             width: 100%;
             height: 100%;
             object-fit: cover;
         }
 
-        .student-avatar-placeholder {
-            width: 100%;
-            height: 100%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 3rem;
-            color: #667eea;
-        }
-
-        .student-name {
+        .profile-name {
             font-size: 1.2rem;
-            font-weight: 600;
-            margin-bottom: 0.3rem;
-            color: #333;
-        }
-
-        .student-major {
-            color: #667eea;
-            font-size: 0.85rem;
+            font-weight: bold;
             margin-bottom: 0.5rem;
         }
 
-        .student-year {
-            color: #999;
-            font-size: 0.8rem;
-            margin-bottom: 1rem;
-        }
-
-        .card-actions {
+        .profile-stats {
             display: flex;
-            gap: 0.5rem;
-            justify-content: center;
+            justify-content: space-around;
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid #e0e0e0;
         }
 
-        .btn-add-friend, .btn-message, .btn-pending {
-            padding: 0.6rem 1.2rem;
-            border: none;
-            border-radius: 0.5rem;
-            cursor: pointer;
-            font-weight: 500;
-            transition: all 0.3s;
+        .stat {
+            text-align: center;
         }
 
-        .btn-add-friend {
-            background: #667eea;
-            color: white;
-            flex: 1;
+        .stat-number {
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: #667eea;
         }
 
-        .btn-add-friend:hover {
-            background: #5568d3;
-        }
-
-        .btn-message {
-            background: #4ade80;
-            color: white;
-            flex: 1;
-        }
-
-        .btn-message:hover {
-            background: #3bc76d;
-        }
-
-        .btn-pending {
-            background: #e0e0e0;
+        .stat-label {
+            font-size: 0.8rem;
             color: #666;
-            flex: 1;
-            cursor: default;
         }
 
-        /* Chat Window */
-        .chat-window {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            width: 350px;
-            height: 500px;
+        .menu-card {
             background: white;
             border-radius: 1rem;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
-            display: none;
-            flex-direction: column;
-        }
-
-        .chat-window.active {
-            display: flex;
-        }
-
-        .chat-header {
             padding: 1rem;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border-radius: 1rem 1rem 0 0;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
         }
 
-        .chat-header-info {
+        .menu-item {
+            padding: 0.75rem;
+            border-radius: 0.5rem;
+            cursor: pointer;
             display: flex;
             align-items: center;
             gap: 0.75rem;
+            transition: background 0.2s;
+            margin-bottom: 0.5rem;
         }
 
-        .chat-avatar {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            overflow: hidden;
+        .menu-item:hover {
+            background: #f0f2f5;
+        }
+
+        .menu-icon {
+            font-size: 1.5rem;
+        }
+
+        /* Center Feed */
+        .center-feed {
+            max-width: 600px;
+        }
+
+        .create-post-card {
             background: white;
+            border-radius: 1rem;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
         }
 
-        .chat-avatar img {
+        .post-input {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .post-input textarea {
+            flex: 1;
+            border: 1px solid #e0e0e0;
+            border-radius: 1rem;
+            padding: 1rem;
+            resize: none;
+            font-family: inherit;
+            font-size: 1rem;
+        }
+
+        .post-actions {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .post-action-btn {
+            flex: 1;
+            padding: 0.75rem;
+            border: none;
+            background: #f0f2f5;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            transition: background 0.3s;
+        }
+
+        .post-action-btn:hover {
+            background: #e4e6eb;
+        }
+
+        .post-card {
+            background: white;
+            border-radius: 1rem;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .post-header {
+            display: flex;
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+        }
+
+        .post-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            overflow: hidden;
+            flex-shrink: 0;
+        }
+
+        .post-avatar img {
             width: 100%;
             height: 100%;
             object-fit: cover;
         }
 
-        .close-chat {
-            background: none;
-            border: none;
-            color: white;
-            font-size: 1.5rem;
-            cursor: pointer;
-            padding: 0;
-            width: 30px;
-            height: 30px;
-        }
-
-        .chat-messages {
+        .post-info {
             flex: 1;
-            overflow-y: auto;
-            padding: 1rem;
-            background: #f9f9f9;
         }
 
-        .chat-message {
+        .post-author {
+            font-weight: bold;
+            margin-bottom: 0.2rem;
+        }
+
+        .post-time {
+            font-size: 0.85rem;
+            color: #666;
+        }
+
+        .post-content {
             margin-bottom: 1rem;
+            line-height: 1.5;
+        }
+
+        .post-media {
+            margin-bottom: 1rem;
+            border-radius: 0.75rem;
+            overflow: hidden;
+        }
+
+        .post-media img, .post-media video {
+            width: 100%;
+            display: block;
+        }
+
+        .post-stats {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.75rem 0;
+            border-bottom: 1px solid #e0e0e0;
+            margin-bottom: 0.75rem;
+            font-size: 0.9rem;
+            color: #666;
+        }
+
+        .post-interactions {
             display: flex;
             gap: 0.5rem;
         }
 
-        .chat-message.own {
-            flex-direction: row-reverse;
+        .interaction-btn {
+            flex: 1;
+            padding: 0.75rem;
+            border: none;
+            background: transparent;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            transition: background 0.2s;
         }
 
-        .message-bubble {
-            max-width: 70%;
+        .interaction-btn:hover {
+            background: #f0f2f5;
+        }
+
+        .interaction-btn.liked {
+            color: #667eea;
+        }
+
+        .comments-section {
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid #e0e0e0;
+        }
+
+        .comment {
+            display: flex;
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+        }
+
+        .comment-avatar {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            background: #667eea;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            overflow: hidden;
+            flex-shrink: 0;
+        }
+
+        .comment-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .comment-content {
+            flex: 1;
+            background: #f0f2f5;
             padding: 0.75rem;
             border-radius: 1rem;
         }
 
-        .chat-message:not(.own) .message-bubble {
-            background: white;
-            border-bottom-left-radius: 0.2rem;
+        .comment-author {
+            font-weight: bold;
+            font-size: 0.9rem;
+            margin-bottom: 0.3rem;
         }
 
-        .chat-message.own .message-bubble {
-            background: #667eea;
-            color: white;
-            border-bottom-right-radius: 0.2rem;
+        .comment-text {
+            font-size: 0.9rem;
         }
 
-        .message-time {
-            font-size: 0.7rem;
-            opacity: 0.7;
-            margin-top: 0.3rem;
-        }
-
-        .chat-input {
-            padding: 1rem;
-            border-top: 1px solid #e0e0e0;
+        .comment-input {
             display: flex;
-            gap: 0.5rem;
+            gap: 0.75rem;
+            margin-top: 1rem;
         }
 
-        .chat-input input {
+        .comment-input input {
             flex: 1;
-            padding: 0.75rem;
             border: 1px solid #e0e0e0;
-            border-radius: 2rem;
-            outline: none;
+            border-radius: 1.5rem;
+            padding: 0.75rem 1rem;
+            font-family: inherit;
         }
 
-        .chat-input button {
+        /* Right Sidebar */
+        .right-sidebar {
+            position: sticky;
+            top: 80px;
+            height: fit-content;
+        }
+
+        .suggestions-card {
+            background: white;
+            border-radius: 1rem;
+            padding: 1.5rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            margin-bottom: 1.5rem;
+        }
+
+        .card-title {
+            font-weight: bold;
+            margin-bottom: 1rem;
+            font-size: 1.1rem;
+        }
+
+        .suggestion-item {
+            display: flex;
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+            align-items: center;
+        }
+
+        .suggestion-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            overflow: hidden;
+            flex-shrink: 0;
+        }
+
+        .suggestion-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .suggestion-info {
+            flex: 1;
+        }
+
+        .suggestion-name {
+            font-weight: 600;
+            font-size: 0.9rem;
+            margin-bottom: 0.2rem;
+        }
+
+        .suggestion-major {
+            font-size: 0.8rem;
+            color: #666;
+        }
+
+        .add-friend-btn {
+            padding: 0.5rem 1rem;
+            border: none;
             background: #667eea;
             color: white;
-            border: none;
-            padding: 0.75rem 1.5rem;
-            border-radius: 2rem;
+            border-radius: 0.5rem;
             cursor: pointer;
             font-weight: 500;
-        }
-
-        .empty-state {
-            text-align: center;
-            padding: 3rem;
-            color: #999;
-        }
-
-        /* Create Profile Button */
-        .create-profile-btn {
-            position: fixed;
-            bottom: 30px;
-            left: 30px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border: none;
-            padding: 1rem 2rem;
-            border-radius: 3rem;
-            font-size: 1rem;
-            font-weight: 600;
-            cursor: pointer;
-            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
-            transition: transform 0.3s;
-        }
-
-        .create-profile-btn:hover {
-            transform: translateY(-3px);
+            font-size: 0.85rem;
         }
 
         /* Modal */
@@ -516,7 +491,7 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background: rgba(0,0,0,0.5);
+            background: rgba(0,0,0,0.7);
             align-items: center;
             justify-content: center;
             z-index: 1000;
@@ -538,8 +513,9 @@
 
         .modal-header {
             font-size: 1.5rem;
+            font-weight: bold;
             margin-bottom: 1.5rem;
-            color: #333;
+            text-align: center;
         }
 
         .form-group {
@@ -549,7 +525,6 @@
         .form-group label {
             display: block;
             margin-bottom: 0.5rem;
-            color: #555;
             font-weight: 500;
         }
 
@@ -564,14 +539,9 @@
             font-family: inherit;
         }
 
-        .form-group textarea {
-            resize: vertical;
-            min-height: 80px;
-        }
-
         .image-upload-area {
             text-align: center;
-            margin-bottom: 1rem;
+            margin-bottom: 1.5rem;
         }
 
         .image-preview {
@@ -582,6 +552,10 @@
             background: #f0f0f0;
             overflow: hidden;
             border: 3px solid #667eea;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
         }
 
         .image-preview img {
@@ -597,6 +571,7 @@
             border: none;
             border-radius: 0.5rem;
             cursor: pointer;
+            font-weight: 500;
         }
 
         .modal-actions {
@@ -629,115 +604,175 @@
             cursor: pointer;
         }
 
-        @media (max-width: 768px) {
-            .sidebar {
-                position: absolute;
-                z-index: 100;
-                left: -300px;
-                transition: left 0.3s;
+        .welcome-screen {
+            text-align: center;
+            padding: 3rem;
+        }
+
+        .welcome-screen h2 {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+        }
+
+        .welcome-screen .btn-submit {
+            max-width: 300px;
+            margin: 2rem auto;
+        }
+
+        @media (max-width: 1200px) {
+            .main-container {
+                grid-template-columns: 1fr;
             }
 
-            .sidebar.mobile-open {
-                left: 0;
+            .left-sidebar, .right-sidebar {
+                display: none;
             }
+        }
 
-            .chat-window {
-                width: 100%;
-                height: 100%;
-                bottom: 0;
-                right: 0;
-                border-radius: 0;
-            }
+        .btn-repost {
+            flex: 1;
+            padding: 0.75rem;
+            border: none;
+            background: transparent;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            transition: background 0.2s;
+        }
+
+        .btn-repost:hover {
+            background: #f0f2f5;
+        }
+
+        .btn-repost.reposted {
+            color: #22c55e;
+        }
+
+        .video-controls {
+            position: relative;
+        }
+
+        .play-pause-btn {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0,0,0,0.6);
+            border: none;
+            color: white;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            font-size: 1.5rem;
+            cursor: pointer;
+            display: none;
+        }
+
+        .video-controls:hover .play-pause-btn {
+            display: block;
         }
     </style>
 </head>
 <body>
-    <div class="app-container">
-        <!-- Sidebar -->
-        <div class="sidebar" id="sidebar">
-            <div class="sidebar-header">
-                <h1>🎓 Campus Connect</h1>
-                <div class="current-user" id="currentUserDisplay">
-                    <div class="current-user-avatar">
-                        <div class="current-user-placeholder">👤</div>
-                    </div>
-                    <div class="current-user-info">
-                        <h3>Guest</h3>
-                        <p>Create your profile</p>
-                    </div>
-                </div>
-            </div>
-
-            <div class="nav-tabs">
-                <button class="nav-tab active" data-tab="friends">
-                    Friends <span class="tab-badge" id="friendsCount">0</span>
-                </button>
-                <button class="nav-tab" data-tab="requests">
-                    Requests <span class="tab-badge" id="requestsCount">0</span>
-                </button>
-            </div>
-
-            <div class="sidebar-content">
-                <div id="friendsTab">
-                    <div class="empty-state">No friends yet. Send some friend requests!</div>
-                </div>
-                <div id="requestsTab" style="display: none;">
-                    <div class="empty-state">No pending requests</div>
-                </div>
+    <!-- Top Navigation -->
+    <nav class="top-nav">
+        <div class="logo">🎓 Campus Social</div>
+        <div class="nav-center">
+            <button class="nav-btn active" data-view="feed">🏠 Feed</button>
+            <button class="nav-btn" data-view="friends">👥 Friends</button>
+            <button class="nav-btn" data-view="videos">🎬 Videos</button>
+        </div>
+        <div class="nav-right">
+            <div class="notification-badge" id="friendRequestBadge" style="display:none;">0</div>
+            <div class="user-avatar-nav" id="userAvatarNav" onclick="showProfile()">
+                <span>👤</span>
             </div>
         </div>
+    </nav>
 
-        <!-- Main Content -->
-        <div class="main-content">
-            <div class="main-header">
-                <h2>Student Directory</h2>
-                <p>Connect with your fellow students</p>
-            </div>
-
-            <div class="content-area">
-                <div class="students-grid" id="studentsGrid">
-                    <div class="empty-state">
-                        <h3>Welcome to Campus Connect!</h3>
-                        <p>Create your profile to start connecting with students</p>
+    <!-- Main Container -->
+    <div class="main-container">
+        <!-- Left Sidebar -->
+        <aside class="left-sidebar" id="leftSidebar">
+            <div class="profile-card">
+                <div class="profile-avatar" id="profileAvatar" onclick="showProfile()">
+                    <span>👤</span>
+                </div>
+                <div class="profile-name" id="profileName">Guest User</div>
+                <div class="profile-stats">
+                    <div class="stat">
+                        <div class="stat-number" id="postsCount">0</div>
+                        <div class="stat-label">Posts</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-number" id="friendsCount">0</div>
+                        <div class="stat-label">Friends</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-number" id="likesCount">0</div>
+                        <div class="stat-label">Likes</div>
                     </div>
                 </div>
             </div>
-        </div>
+
+            <div class="menu-card">
+                <div class="menu-item" onclick="changeView('friends')">
+                    <div class="menu-icon">👥</div>
+                    <div>My Friends</div>
+                </div>
+                <div class="menu-item" onclick="changeView('videos')">
+                    <div class="menu-icon">🎬</div>
+                    <div>Videos</div>
+                </div>
+                <div class="menu-item">
+                    <div class="menu-icon">📸</div>
+                    <div>Photos</div>
+                </div>
+                <div class="menu-item">
+                    <div class="menu-icon">⚙️</div>
+                    <div>Settings</div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Center Feed -->
+        <main class="center-feed" id="centerFeed">
+            <div class="welcome-screen" id="welcomeScreen">
+                <h2>👋 Welcome to Campus Social!</h2>
+                <p style="margin-bottom: 2rem; color: #666;">Create your profile to start connecting with students, sharing posts, and making friends!</p>
+                <button class="btn-submit" onclick="openProfileModal()">Create Your Profile</button>
+            </div>
+        </main>
+
+        <!-- Right Sidebar -->
+        <aside class="right-sidebar" id="rightSidebar">
+            <div class="suggestions-card">
+                <div class="card-title">Friend Requests</div>
+                <div id="friendRequestsList">
+                    <p style="color: #666; font-size: 0.9rem;">No pending requests</p>
+                </div>
+            </div>
+
+            <div class="suggestions-card">
+                <div class="card-title">Suggested Friends</div>
+                <div id="suggestionsList">
+                    <p style="color: #666; font-size: 0.9rem;">Create your profile to see suggestions</p>
+                </div>
+            </div>
+        </aside>
     </div>
 
-    <!-- Chat Window -->
-    <div class="chat-window" id="chatWindow">
-        <div class="chat-header">
-            <div class="chat-header-info">
-                <div class="chat-avatar" id="chatAvatar">
-                    <div style="width:100%; height:100%; display:flex; align-items:center; justify-content:center; font-size:1.5rem; color:#667eea; background:white;">👤</div>
-                </div>
-                <div>
-                    <div style="font-weight: 600;" id="chatName">Student Name</div>
-                    <div style="font-size: 0.8rem; opacity: 0.9;">Online</div>
-                </div>
-            </div>
-            <button class="close-chat" id="closeChat">×</button>
-        </div>
-        <div class="chat-messages" id="chatMessages"></div>
-        <div class="chat-input">
-            <input type="text" id="chatInput" placeholder="Type a message...">
-            <button id="sendMessage">Send</button>
-        </div>
-    </div>
-
-    <!-- Create Profile Button -->
-    <button class="create-profile-btn" id="createProfileBtn">+ Create Profile</button>
-
-    <!-- Create Profile Modal -->
+    <!-- Profile Modal -->
     <div class="modal" id="profileModal">
         <div class="modal-content">
             <h2 class="modal-header">Create Your Profile</h2>
             <form id="profileForm">
                 <div class="image-upload-area">
-                    <div class="image-preview" id="imagePreview">
-                        <div style="width:100%; height:100%; display:flex; align-items:center; justify-content:center; font-size:3rem; color:#ccc;">📷</div>
-                    </div>
+                    <div class="image-preview" id="imagePreview">📷</div>
                     <input type="file" id="profilePicture" accept="image/*" style="display:none;">
                     <button type="button" class="upload-btn" onclick="document.getElementById('profilePicture').click()">Upload Photo</button>
                 </div>
@@ -745,11 +780,6 @@
                 <div class="form-group">
                     <label>Full Name *</label>
                     <input type="text" id="fullName" required>
-                </div>
-
-                <div class="form-group">
-                    <label>Student ID *</label>
-                    <input type="text" id="studentId" required>
                 </div>
 
                 <div class="form-group">
@@ -768,6 +798,7 @@
                         <option>Law</option>
                         <option>Arts</option>
                         <option>Psychology</option>
+                        <option>Mathematics</option>
                     </select>
                 </div>
 
@@ -785,11 +816,11 @@
 
                 <div class="form-group">
                     <label>Bio</label>
-                    <textarea id="bio" placeholder="Tell us about yourself..."></textarea>
+                    <textarea id="bio" rows="3" placeholder="Tell us about yourself..."></textarea>
                 </div>
 
                 <div class="modal-actions">
-                    <button type="button" class="btn-cancel" id="cancelProfile">Cancel</button>
+                    <button type="button" class="btn-cancel" onclick="closeProfileModal()">Cancel</button>
                     <button type="submit" class="btn-submit">Create Profile</button>
                 </div>
             </form>
@@ -799,342 +830,477 @@
     <script>
         // App State
         let currentUser = null;
-        let students = [];
+        let users = [];
+        let posts = [];
         let friendRequests = [];
         let friends = [];
-        let chats = {};
-        let currentChatUser = null;
+        let currentView = 'feed';
         let currentImageData = null;
 
-        // DOM Elements
-        const profileModal = document.getElementById('profileModal');
-        const createProfileBtn = document.getElementById('createProfileBtn');
-        const profileForm = document.getElementById('profileForm');
-        const studentsGrid = document.getElementById('studentsGrid');
-        const chatWindow = document.getElementById('chatWindow');
-        const closeChat = document.getElementById('closeChat');
-        const sendMessage = document.getElementById('sendMessage');
-        const chatInput = document.getElementById('chatInput');
-        const friendsTab = document.getElementById('friendsTab');
-        const requestsTab = document.getElementById('requestsTab');
+        // Initialize
+        function init() {
+            setupEventListeners();
+            checkForUser();
+        }
 
-        // Event Listeners
-        createProfileBtn.addEventListener('click', () => {
-            profileModal.classList.add('active');
-        });
+        function setupEventListeners() {
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+                    changeView(this.dataset.view);
+                });
+            });
 
-        document.getElementById('cancelProfile').addEventListener('click', () => {
-            profileModal.classList.remove('active');
-        });
+            document.getElementById('profilePicture').addEventListener('change', function(e) {
+                const file = e.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function(event) {
+                        currentImageData = event.target.result;
+                        document.getElementById('imagePreview').innerHTML = `<img src="${currentImageData}" alt="Preview">`;
+                    };
+                    reader.readAsDataURL(file);
+                }
+            });
 
-        document.getElementById('profilePicture').addEventListener('change', function(e) {
-            const file = e.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = function(event) {
-                    currentImageData = event.target.result;
-                    document.getElementById('imagePreview').innerHTML = `<img src="${currentImageData}" alt="Preview">`;
-                };
-                reader.readAsDataURL(file);
+            document.getElementById('profileForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                createProfile();
+            });
+        }
+
+        function checkForUser() {
+            if (!currentUser) {
+                document.getElementById('welcomeScreen').style.display = 'block';
             }
-        });
+        }
 
-        profileForm.addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            const student = {
+        function openProfileModal() {
+            document.getElementById('profileModal').classList.add('active');
+        }
+
+        function closeProfileModal() {
+            document.getElementById('profileModal').classList.remove('active');
+        }
+
+        function createProfile() {
+            const user = {
                 id: Date.now(),
                 fullName: document.getElementById('fullName').value,
-                studentId: document.getElementById('studentId').value,
                 email: document.getElementById('email').value,
                 major: document.getElementById('major').value,
                 year: document.getElementById('year').value,
                 bio: document.getElementById('bio').value,
-                image: currentImageData
+                image: currentImageData,
+                posts: [],
+                friends: [],
+                likes: 0
             };
 
-            currentUser = student;
-            students.push(student);
+            currentUser = user;
+            users.push(user);
             
-            profileModal.classList.remove('active');
-            profileForm.reset();
+            closeProfileModal();
+            document.getElementById('profileForm').reset();
             currentImageData = null;
-            document.getElementById('imagePreview').innerHTML = '<div style="width:100%; height:100%; display:flex; align-items:center; justify-content:center; font-size:3rem; color:#ccc;">📷</div>';
+            document.getElementById('imagePreview').innerHTML = '📷';
             
-            createProfileBtn.style.display = 'none';
-            updateCurrentUserDisplay();
-            renderStudents();
-            
-            alert('Profile created successfully! 🎉');
-        });
-
-        // Tab switching
-        document.querySelectorAll('.nav-tab').forEach(tab => {
-            tab.addEventListener('click', function() {
-                document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
-                this.classList.add('active');
-                
-                const tabName = this.dataset.tab;
-                if (tabName === 'friends') {
-                    friendsTab.style.display = 'block';
-                    requestsTab.style.display = 'none';
-                } else {
-                    friendsTab.style.display = 'none';
-                    requestsTab.style.display = 'block';
-                }
-            });
-        });
-
-        closeChat.addEventListener('click', () => {
-            chatWindow.classList.remove('active');
-        });
-
-        sendMessage.addEventListener('click', sendChatMessage);
-        chatInput.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') sendChatMessage();
-        });
-
-        // Functions
-        function updateCurrentUserDisplay() {
-            if (!currentUser) return;
-            
-            const display = `
-                <div class="current-user-avatar">
-                    ${currentUser.image 
-                        ? `<img src="${currentUser.image}" alt="${currentUser.fullName}">` 
-                        : '<div class="current-user-placeholder">👤</div>'}
-                </div>
-                <div class="current-user-info">
-                    <h3>${currentUser.fullName}</h3>
-                    <p>${currentUser.major}</p>
-                </div>
-            `;
-            document.getElementById('currentUserDisplay').innerHTML = display;
+            updateUserInterface();
+            createSampleUsers();
+            renderFeed();
         }
 
-        function renderStudents() {
-            if (students.length === 0) {
-                studentsGrid.innerHTML = '<div class="empty-state"><h3>No students yet</h3><p>Be the first to create a profile!</p></div>';
+        function updateUserInterface() {
+            document.getElementById('welcomeScreen').style.display = 'none';
+            
+            const avatar = currentUser.image 
+                ? `<img src="${currentUser.image}" alt="${currentUser.fullName}">` 
+                : currentUser.fullName.charAt(0).toUpperCase();
+            
+            document.getElementById('userAvatarNav').innerHTML = avatar;
+            document.getElementById('profileAvatar').innerHTML = avatar;
+            document.getElementById('profileName').textContent = currentUser.fullName;
+            
+            document.getElementById('centerFeed').innerHTML = `
+                <div class="create-post-card">
+                    <div class="post-input">
+                        <textarea id="postText" placeholder="What's on your mind, ${currentUser.fullName.split(' ')[0]}?" rows="3"></textarea>
+                    </div>
+                    <div class="post-actions">
+                        <button class="post-action-btn" onclick="document.getElementById('postImage').click()">
+                            📷 Photo
+                            <input type="file" id="postImage" accept="image/*" style="display:none;">
+                        </button>
+                        <button class="post-action-btn" onclick="document.getElementById('postVideo').click()">
+                            🎬 Video
+                            <input type="file" id="postVideo" accept="video/*" style="display:none;">
+                        </button>
+                        <button class="post-action-btn" onclick="createPost()" style="background: #667eea; color: white;">
+                            Post
+                        </button>
+                    </div>
+                </div>
+                <div id="feedContainer"></div>
+            `;
+
+            document.getElementById('postImage').addEventListener('change', handleMediaUpload);
+            document.getElementById('postVideo').addEventListener('change', handleMediaUpload);
+            
+            renderSuggestions();
+            updateStats();
+        }
+
+        let pendingMedia = null;
+
+        function handleMediaUpload(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    pendingMedia = {
+                        type: file.type.startsWith('image') ? 'image' : 'video',
+                        data: event.target.result
+                    };
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function createPost() {
+            const text = document.getElementById('postText').value.trim();
+            if (!text && !pendingMedia) {
+                alert('Please write something or add media!');
                 return;
             }
 
-            studentsGrid.innerHTML = students.map(student => {
-                if (currentUser && student.id === currentUser.id) return '';
-                
-                const isFriend = friends.some(f => f.id === student.id);
-                const isPending = friendRequests.some(r => r.to === student.id && r.from === currentUser?.id);
+            const post = {
+                id: Date.now(),
+                author: currentUser,
+                content: text,
+                media: pendingMedia,
+                likes: 0,
+                likedBy: [],
+                reposts: 0,
+                repostedBy: [],
+                comments: [],
+                timestamp: new Date()
+            };
+
+            posts.unshift(post);
+            currentUser.posts.push(post.id);
+            
+            document.getElementById('postText').value = '';
+            pendingMedia = null;
+            document.getElementById('postImage').value = '';
+            document.getElementById('postVideo').value = '';
+            
+            renderFeed();
+            updateStats();
+        }
+
+        function renderFeed() {
+            const feedContainer = document.getElementById('feedContainer');
+            if (!feedContainer) return;
+
+            if (posts.length === 0) {
+                feedContainer.innerHTML = '<div class="post-card" style="text-align:center; color:#666;">No posts yet. Be the first to share something!</div>';
+                return;
+            }
+
+            feedContainer.innerHTML = posts.map(post => {
+                const isLiked = post.likedBy.includes(currentUser.id);
+                const isReposted = post.repostedBy.includes(currentUser.id);
                 
                 return `
-                    <div class="student-card">
-                        <div class="student-avatar">
-                            ${student.image 
-                                ? `<img src="${student.image}" alt="${student.fullName}">` 
-                                : '<div class="student-avatar-placeholder">👤</div>'}
+                    <div class="post-card">
+                        <div class="post-header">
+                            <div class="post-avatar">
+                                ${post.author.image 
+                                    ? `<img src="${post.author.image}" alt="${post.author.fullName}">` 
+                                    : post.author.fullName.charAt(0).toUpperCase()}
+                            </div>
+                            <div class="post-info">
+                                <div class="post-author">${post.author.fullName}</div>
+                                <div class="post-time">${formatTime(post.timestamp)} • ${post.author.year}</div>
+                            </div>
                         </div>
-                        <div class="student-name">${student.fullName}</div>
-                        <div class="student-major">${student.major}</div>
-                        <div class="student-year">${student.year}</div>
-                        ${student.bio ? `<p style="font-size:0.85rem; color:#666; margin-bottom:1rem;">${student.bio}</p>` : ''}
-                        <div class="card-actions">
-                            ${!currentUser ? '' : 
-                                isFriend 
-                                    ? `<button class="btn-message" onclick="openChat(${student.id})">💬 Message</button>`
-                                    : isPending
-                                        ? `<button class="btn-pending">⏳ Pending</button>`
-                                        : `<button class="btn-add-friend" onclick="sendFriendRequest(${student.id})">➕ Add Friend</button>`
-                            }
+                        
+                        ${post.content ? `<div class="post-content">${post.content}</div>` : ''}
+                        
+                        ${post.media ? `
+                            <div class="post-media">
+                                ${post.media.type === 'image' 
+                                    ? `<img src="${post.media.data}" alt="Post media">` 
+                                    : `
+                                        <div class="video-controls">
+                                            <video controls>
+                                                <source src="${post.media.data}" type="video/mp4">
+                                            </video>
+                                            <button class="play-pause-btn" onclick="toggleVideo(this)">▶️</button>
+                                        </div>
+                                    `}
+                            </div>
+                        ` : ''}
+                        
+                        <div class="post-stats">
+                            <div>${post.likes} likes • ${post.comments.length} comments</div>
+                            <div>${post.reposts} reposts</div>
+                        </div>
+                        
+                        <div class="post-interactions">
+                            <button class="interaction-btn ${isLiked ? 'liked' : ''}" onclick="toggleLike(${post.id})">
+                                ${isLiked ? '❤️' : '🤍'} Like
+                            </button>
+                            <button class="interaction-btn" onclick="toggleComments(${post.id})">
+                                💬 Comment
+                            </button>
+                            <button class="btn-repost ${isReposted ? 'reposted' : ''}" onclick="toggleRepost(${post.id})">
+                                ${isReposted ? '🔄' : '↗️'} Repost
+                            </button>
+                        </div>
+                        
+                        <div class="comments-section" id="comments-${post.id}" style="display:none;">
+                            ${post.comments.map(comment => `
+                                <div class="comment">
+                                    <div class="comment-avatar">
+                                        ${comment.author.image 
+                                            ? `<img src="${comment.author.image}" alt="${comment.author.fullName}">` 
+                                            : comment.author.fullName.charAt(0).toUpperCase()}
+                                    </div>
+                                    <div class="comment-content">
+                                        <div class="comment-author">${comment.author.fullName}</div>
+                                        <div class="comment-text">${comment.text}</div>
+                                    </div>
+                                </div>
+                            `).join('')}
+                            
+                            <div class="comment-input">
+                                <div class="comment-avatar">
+                                    ${currentUser.image 
+                                        ? `<img src="${currentUser.image}" alt="${currentUser.fullName}">` 
+                                        : currentUser.fullName.charAt(0).toUpperCase()}
+                                </div>
+                                <input type="text" placeholder="Write a comment..." id="comment-input-${post.id}" onkeypress="if(event.key==='Enter') addComment(${post.id})">
+                            </div>
                         </div>
                     </div>
                 `;
             }).join('');
         }
 
-        function sendFriendRequest(studentId) {
-            if (!currentUser) {
-                alert('Please create your profile first!');
+        function toggleLike(postId) {
+            const post = posts.find(p => p.id === postId);
+            if (!post) return;
+
+            const index = post.likedBy.indexOf(currentUser.id);
+            if (index > -1) {
+                post.likedBy.splice(index, 1);
+                post.likes--;
+            } else {
+                post.likedBy.push(currentUser.id);
+                post.likes++;
+            }
+            
+            renderFeed();
+            updateStats();
+        }
+
+        function toggleRepost(postId) {
+            const post = posts.find(p => p.id === postId);
+            if (!post) return;
+
+            const index = post.repostedBy.indexOf(currentUser.id);
+            if (index > -1) {
+                post.repostedBy.splice(index, 1);
+                post.reposts--;
+            } else {
+                post.repostedBy.push(currentUser.id);
+                post.reposts++;
+                
+                const repost = {
+                    id: Date.now(),
+                    author: currentUser,
+                    content: `Reposted from ${post.author.fullName}`,
+                    originalPost: post,
+                    media: post.media,
+                    likes: 0,
+                    likedBy: [],
+                    reposts: 0,
+                    repostedBy: [],
+                    comments: [],
+                    timestamp: new Date()
+                };
+                posts.unshift(repost);
+            }
+            
+            renderFeed();
+        }
+
+        function toggleComments(postId) {
+            const commentsSection = document.getElementById(`comments-${postId}`);
+            commentsSection.style.display = commentsSection.style.display === 'none' ? 'block' : 'none';
+        }
+
+        function addComment(postId) {
+            const input = document.getElementById(`comment-input-${postId}`);
+            const text = input.value.trim();
+            if (!text) return;
+
+            const post = posts.find(p => p.id === postId);
+            if (!post) return;
+
+            post.comments.push({
+                id: Date.now(),
+                author: currentUser,
+                text: text,
+                timestamp: new Date()
+            });
+
+            input.value = '';
+            renderFeed();
+            toggleComments(postId);
+        }
+
+        function createSampleUsers() {
+            const sampleUsers = [
+                { name: 'Emma Wilson', major: 'Computer Science', year: 'Junior', emoji: '👩‍💻' },
+                { name: 'Marcus Johnson', major: 'Engineering', year: 'Senior', emoji: '👨‍🔧' },
+                { name: 'Sophia Chen', major: 'Business', year: 'Sophomore', emoji: '👩‍💼' },
+                { name: 'Liam Brown', major: 'Medicine', year: 'Graduate', emoji: '👨‍⚕️' },
+                { name: 'Olivia Davis', major: 'Arts', year: 'Freshman', emoji: '🎨' }
+            ];
+
+            sampleUsers.forEach(user => {
+                users.push({
+                    id: Date.now() + Math.random(),
+                    fullName: user.name,
+                    email: user.name.toLowerCase().replace(' ', '.') + '@university.edu',
+                    major: user.major,
+                    year: user.year,
+                    emoji: user.emoji,
+                    posts: [],
+                    friends: [],
+                    likes: 0
+                });
+            });
+
+            renderSuggestions();
+        }
+
+        function renderSuggestions() {
+            const container = document.getElementById('suggestionsList');
+            const otherUsers = users.filter(u => u.id !== currentUser.id && !friends.some(f => f.id === u.id));
+
+            if (otherUsers.length === 0) {
+                container.innerHTML = '<p style="color: #666; font-size: 0.9rem;">No suggestions available</p>';
                 return;
             }
 
-            const request = {
-                id: Date.now(),
-                from: currentUser.id,
-                to: studentId,
-                fromUser: currentUser
-            };
+            container.innerHTML = otherUsers.slice(0, 5).map(user => `
+                <div class="suggestion-item">
+                    <div class="suggestion-avatar">
+                        ${user.image 
+                            ? `<img src="${user.image}" alt="${user.fullName}">` 
+                            : (user.emoji || user.fullName.charAt(0).toUpperCase())}
+                    </div>
+                    <div class="suggestion-info">
+                        <div class="suggestion-name">${user.fullName}</div>
+                        <div class="suggestion-major">${user.major}</div>
+                    </div>
+                    <button class="add-friend-btn" onclick="sendFriendRequest(${user.id})">+ Add</button>
+                </div>
+            `).join('');
+        }
 
-            friendRequests.push(request);
-            renderStudents();
-            updateRequestsCount();
-            alert('Friend request sent! 🎉');
+        function sendFriendRequest(userId) {
+            const user = users.find(u => u.id === userId);
+            if (!user) return;
+
+            friendRequests.push({
+                id: Date.now(),
+                from: currentUser,
+                to: user,
+                timestamp: new Date()
+            });
+
+            alert(`Friend request sent to ${user.fullName}! 🎉`);
+            updateFriendRequestBadge();
+            
+            setTimeout(() => {
+                acceptFriendRequest(friendRequests[friendRequests.length - 1].id);
+            }, 2000);
         }
 
         function acceptFriendRequest(requestId) {
             const request = friendRequests.find(r => r.id === requestId);
-            if (request) {
-                const friend = students.find(s => s.id === request.from);
-                if (friend) {
-                    friends.push(friend);
-                    friendRequests = friendRequests.filter(r => r.id !== requestId);
-                    renderFriends();
-                    renderRequests();
-                    renderStudents();
-                    updateCounts();
-                }
-            }
-        }
+            if (!request) return;
 
-        function declineFriendRequest(requestId) {
+            friends.push(request.to);
             friendRequests = friendRequests.filter(r => r.id !== requestId);
-            renderRequests();
-            updateRequestsCount();
+
+            renderSuggestions();
+            updateStats();
+            updateFriendRequestBadge();
         }
 
-        function renderFriends() {
-            if (friends.length === 0) {
-                friendsTab.innerHTML = '<div class="empty-state">No friends yet. Send some friend requests!</div>';
-                return;
+        function updateFriendRequestBadge() {
+            const badge = document.getElementById('friendRequestBadge');
+            if (friendRequests.length > 0) {
+                badge.textContent = friendRequests.length;
+                badge.style.display = 'block';
+            } else {
+                badge.style.display = 'none';
             }
-
-            friendsTab.innerHTML = friends.map(friend => `
-                <div class="friend-item" onclick="openChat(${friend.id})">
-                    <div class="friend-avatar">
-                        ${friend.image 
-                            ? `<img src="${friend.image}" alt="${friend.fullName}">` 
-                            : '<div class="friend-avatar-placeholder">👤</div>'}
-                    </div>
-                    <div class="friend-info">
-                        <div class="friend-name">${friend.fullName}</div>
-                        <div class="friend-status"><span class="online-indicator"></span>Online</div>
-                    </div>
-                </div>
-            `).join('');
         }
 
-        function renderRequests() {
-            const myRequests = friendRequests.filter(r => r.to === currentUser?.id);
-            
-            if (myRequests.length === 0) {
-                requestsTab.innerHTML = '<div class="empty-state">No pending requests</div>';
-                return;
-            }
-
-            requestsTab.innerHTML = myRequests.map(request => `
-                <div class="request-item">
-                    <div class="friend-avatar">
-                        ${request.fromUser.image 
-                            ? `<img src="${request.fromUser.image}" alt="${request.fromUser.fullName}">` 
-                            : '<div class="friend-avatar-placeholder">👤</div>'}
-                    </div>
-                    <div class="friend-info">
-                        <div class="friend-name">${request.fromUser.fullName}</div>
-                        <div class="friend-status">${request.fromUser.major}</div>
-                    </div>
-                    <div class="request-actions">
-                        <button class="btn-accept" onclick="acceptFriendRequest(${request.id})">✓</button>
-                        <button class="btn-decline" onclick="declineFriendRequest(${request.id})">✕</button>
-                    </div>
-                </div>
-            `).join('');
-        }
-
-        function updateCounts() {
+        function updateStats() {
+            document.getElementById('postsCount').textContent = currentUser.posts.length;
             document.getElementById('friendsCount').textContent = friends.length;
-            updateRequestsCount();
+            
+            let totalLikes = 0;
+            posts.forEach(post => {
+                if (post.author.id === currentUser.id) {
+                    totalLikes += post.likes;
+                }
+            });
+            document.getElementById('likesCount').textContent = totalLikes;
         }
 
-        function updateRequestsCount() {
-            const myRequests = friendRequests.filter(r => r.to === currentUser?.id);
-            document.getElementById('requestsCount').textContent = myRequests.length;
+        function formatTime(timestamp) {
+            const now = new Date();
+            const diff = Math.floor((now - timestamp) / 1000);
+            
+            if (diff < 60) return 'Just now';
+            if (diff < 3600) return `${Math.floor(diff / 60)}m ago`;
+            if (diff < 86400) return `${Math.floor(diff / 3600)}h ago`;
+            return `${Math.floor(diff / 86400)}d ago`;
         }
 
-        function openChat(studentId) {
-            const student = students.find(s => s.id === studentId);
-            if (!student) return;
+        function changeView(view) {
+            currentView = view;
+            // Implement view changes here
+        }
 
-            currentChatUser = student;
-            
-            document.getElementById('chatName').textContent = student.fullName;
-            document.getElementById('chatAvatar').innerHTML = student.image 
-                ? `<img src="${student.image}" alt="${student.fullName}">` 
-                : '<div style="width:100%; height:100%; display:flex; align-items:center; justify-content:center; font-size:1.5rem; color:#667eea; background:white;">👤</div>';
-            
-            if (!chats[studentId]) {
-                chats[studentId] = [];
+        function showProfile() {
+            if (currentUser) {
+                alert(`Profile: ${currentUser.fullName}\n${currentUser.major} - ${currentUser.year}\n${currentUser.bio || 'No bio yet'}`);
             }
-            
-            renderChatMessages(studentId);
-            chatWindow.classList.add('active');
         }
 
-        function renderChatMessages(studentId) {
-            const messages = chats[studentId] || [];
-            const chatMessages = document.getElementById('chatMessages');
-            
-            if (messages.length === 0) {
-                chatMessages.innerHTML = '<div class="empty-state">No messages yet. Start the conversation!</div>';
-                return;
+        function toggleVideo(btn) {
+            const video = btn.parentElement.querySelector('video');
+            if (video.paused) {
+                video.play();
+                btn.textContent = '⏸️';
+            } else {
+                video.pause();
+                btn.textContent = '▶️';
             }
-
-            chatMessages.innerHTML = messages.map(msg => `
-                <div class="chat-message ${msg.fromCurrentUser ? 'own' : ''}">
-                    <div class="message-bubble">
-                        <div>${msg.text}</div>
-                        <div class="message-time">${msg.time}</div>
-                    </div>
-                </div>
-            `).join('');
-            
-            chatMessages.scrollTop = chatMessages.scrollHeight;
         }
 
-        function sendChatMessage() {
-            const text = chatInput.value.trim();
-            if (!text || !currentChatUser) return;
-
-            const message = {
-                text: text,
-                time: new Date().toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' }),
-                fromCurrentUser: true
-            };
-
-            if (!chats[currentChatUser.id]) {
-                chats[currentChatUser.id] = [];
-            }
-
-            chats[currentChatUser.id].push(message);
-            renderChatMessages(currentChatUser.id);
-            chatInput.value = '';
-
-            // Simulate response
-            setTimeout(() => {
-                const response = {
-                    text: getRandomResponse(),
-                    time: new Date().toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' }),
-                    fromCurrentUser: false
-                };
-                chats[currentChatUser.id].push(response);
-                renderChatMessages(currentChatUser.id);
-            }, 1000);
-        }
-
-        function getRandomResponse() {
-            const responses = [
-                "Hey! Thanks for the message 😊",
-                "That sounds great!",
-                "I'd love to chat more about this!",
-                "Absolutely! When are you free?",
-                "Nice to hear from you!",
-                "Sounds good to me!",
-                "Let's meet up sometime!",
-                "That's awesome! Tell me more.",
-                "I'm doing well, how about you?",
-                "Sure thing! Count me in."
-            ];
-            return responses[Math.floor(Math.random() * responses.length)];
-        }
-
-        // Initialize
-        renderStudents();
+        // Initialize app
+        init();
     </script>
 </body>
 </html>
