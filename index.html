@@ -781,8 +781,8 @@
         }
 
         .dataset-item {
-            padding: 12px;
-            margin: 5px 0;
+            padding: 10px 12px;
+            margin: 4px 0;
             background: #161b22;
             border: 1px solid #30363d;
             border-radius: 6px;
@@ -790,35 +790,102 @@
             transition: all 0.2s ease;
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 10px;
         }
 
         .dataset-item:hover {
             background: #21262d;
             border-color: #58a6ff;
-            transform: translateX(3px);
         }
 
         .dataset-item.selected {
             background: rgba(88, 166, 255, 0.15);
             border-color: #58a6ff;
-            box-shadow: 0 0 0 1px rgba(88, 166, 255, 0.3);
+        }
+
+        .dataset-item.parent-selected {
+            background: rgba(46, 160, 67, 0.1);
+            border-color: #2ea043;
+        }
+
+        .dataset-toggle {
+            display: inline-block;
+            width: 20px;
+            cursor: pointer;
+            color: #58a6ff;
+            font-weight: bold;
+            font-size: 14px;
         }
 
         .dataset-checkbox {
-            width: 20px;
-            height: 20px;
+            width: 18px;
+            height: 18px;
             cursor: pointer;
             accent-color: #58a6ff;
+            flex-shrink: 0;
         }
 
         .dataset-name {
             flex: 1;
             color: #e6edf3;
             font-size: 14px;
+            font-weight: 500;
         }
 
         .dataset-item.selected .dataset-name {
+            color: #58a6ff;
+            font-weight: 600;
+        }
+
+        .dataset-elements {
+            margin-left: 30px;
+            margin-top: 5px;
+            display: none;
+        }
+
+        .dataset-elements.expanded {
+            display: block;
+        }
+
+        .dataset-element-item {
+            padding: 8px 12px;
+            margin: 3px 0;
+            background: #0d1117;
+            border: 1px solid #30363d;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .dataset-element-item:hover {
+            background: #161b22;
+            border-color: #58a6ff;
+            transform: translateX(3px);
+        }
+
+        .dataset-element-item.selected {
+            background: rgba(88, 166, 255, 0.15);
+            border-color: #58a6ff;
+        }
+
+        .dataset-element-checkbox {
+            width: 16px;
+            height: 16px;
+            cursor: pointer;
+            accent-color: #58a6ff;
+            flex-shrink: 0;
+        }
+
+        .dataset-element-name {
+            flex: 1;
+            color: #8b949e;
+            font-size: 13px;
+        }
+
+        .dataset-element-item.selected .dataset-element-name {
             color: #58a6ff;
             font-weight: 600;
         }
@@ -1102,6 +1169,7 @@
         // Dataset download state
         let datasetsData = [];
         let selectedDatasets = new Set();
+        let selectedDataElements = new Set();
         let orgUnitsData = [];
         let selectedOrgUnits = new Set();
 
@@ -2498,48 +2566,70 @@
             datasets.forEach(ds => {
                 const wrapper = document.createElement('div');
                 
+                // Dataset item
                 const item = document.createElement('div');
                 item.className = 'dataset-item';
                 item.dataset.id = ds.id;
-                if (selectedDatasets.has(ds.id)) {
+                
+                // Update selection state
+                const hasSelectedElements = ds.dataSetElements?.some(dse => 
+                    dse.dataElement && selectedDataElements.has(dse.dataElement.id)
+                );
+                const allElementsSelected = ds.dataSetElements?.every(dse => 
+                    dse.dataElement && selectedDataElements.has(dse.dataElement.id)
+                );
+                
+                if (allElementsSelected && ds.dataSetElements?.length > 0) {
                     item.classList.add('selected');
+                } else if (hasSelectedElements) {
+                    item.classList.add('parent-selected');
                 }
                 
-                const collapseBtn = document.createElement('button');
-                collapseBtn.className = 'dataset-collapse-btn';
-                collapseBtn.textContent = '▶';
-                collapseBtn.onclick = (e) => {
-                    e.stopPropagation();
-                    toggleDatasetElements(ds.id);
-                };
+                // Toggle button
+                const toggle = document.createElement('span');
+                toggle.className = 'dataset-toggle';
+                if (ds.dataSetElements && ds.dataSetElements.length > 0) {
+                    toggle.textContent = '▶';
+                    toggle.onclick = (e) => {
+                        e.stopPropagation();
+                        toggleDatasetElements(ds.id);
+                    };
+                } else {
+                    toggle.textContent = '  ';
+                    toggle.style.cursor = 'default';
+                }
                 
+                // Checkbox
                 const checkbox = document.createElement('input');
                 checkbox.type = 'checkbox';
                 checkbox.className = 'dataset-checkbox';
-                checkbox.checked = selectedDatasets.has(ds.id);
+                checkbox.checked = allElementsSelected && ds.dataSetElements?.length > 0;
+                checkbox.indeterminate = hasSelectedElements && !allElementsSelected;
                 checkbox.dataset.id = ds.id;
                 checkbox.onclick = (e) => {
                     e.stopPropagation();
-                    toggleDatasetSelection(ds.id);
+                    toggleDatasetSelection(ds.id, ds.dataSetElements);
                 };
                 
+                // Name
                 const name = document.createElement('span');
                 name.className = 'dataset-name';
                 const periodType = ds.periodType ? ` (${ds.periodType})` : '';
                 const elementCount = ds.dataSetElements ? ` - ${ds.dataSetElements.length} elements` : '';
                 name.textContent = (ds.displayName || ds.name || ds.id) + periodType + elementCount;
                 
+                // Click handler for the whole item
                 item.onclick = (e) => {
-                    if (e.target.type === 'checkbox') return;
-                    checkbox.checked = !checkbox.checked;
-                    toggleDatasetSelection(ds.id);
+                    if (e.target.type === 'checkbox' || e.target.className.includes('toggle')) return;
+                    toggleDatasetElements(ds.id);
                 };
                 
-                item.appendChild(collapseBtn);
+                item.appendChild(toggle);
                 item.appendChild(checkbox);
                 item.appendChild(name);
                 wrapper.appendChild(item);
                 
+                // Data elements
                 if (ds.dataSetElements && ds.dataSetElements.length > 0) {
                     const elementsDiv = document.createElement('div');
                     elementsDiv.className = 'dataset-elements';
@@ -2547,10 +2637,39 @@
                     
                     ds.dataSetElements.forEach(dse => {
                         if (dse.dataElement) {
-                            const el = document.createElement('div');
-                            el.className = 'dataset-element-item';
-                            el.textContent = `• ${dse.dataElement.displayName || dse.dataElement.name || dse.dataElement.id}`;
-                            elementsDiv.appendChild(el);
+                            const elItem = document.createElement('div');
+                            elItem.className = 'dataset-element-item';
+                            elItem.dataset.id = dse.dataElement.id;
+                            elItem.dataset.parentId = ds.id;
+                            
+                            if (selectedDataElements.has(dse.dataElement.id)) {
+                                elItem.classList.add('selected');
+                            }
+                            
+                            const elCheckbox = document.createElement('input');
+                            elCheckbox.type = 'checkbox';
+                            elCheckbox.className = 'dataset-element-checkbox';
+                            elCheckbox.checked = selectedDataElements.has(dse.dataElement.id);
+                            elCheckbox.dataset.id = dse.dataElement.id;
+                            elCheckbox.dataset.parentId = ds.id;
+                            elCheckbox.onclick = (e) => {
+                                e.stopPropagation();
+                                toggleDataElementSelection(dse.dataElement.id, ds.id, ds.dataSetElements);
+                            };
+                            
+                            const elName = document.createElement('span');
+                            elName.className = 'dataset-element-name';
+                            elName.textContent = dse.dataElement.displayName || dse.dataElement.name || dse.dataElement.id;
+                            
+                            elItem.onclick = (e) => {
+                                if (e.target.type === 'checkbox') return;
+                                elCheckbox.checked = !elCheckbox.checked;
+                                toggleDataElementSelection(dse.dataElement.id, ds.id, ds.dataSetElements);
+                            };
+                            
+                            elItem.appendChild(elCheckbox);
+                            elItem.appendChild(elName);
+                            elementsDiv.appendChild(elItem);
                         }
                     });
                     
@@ -2565,25 +2684,106 @@
 
         function toggleDatasetElements(id) {
             const elementsDiv = document.getElementById(`elements-${id}`);
-            const btn = document.querySelector(`[data-id="${id}"] .dataset-collapse-btn`);
+            const toggle = document.querySelector(`.dataset-item[data-id="${id}"] .dataset-toggle`);
             
-            if (elementsDiv && btn) {
+            if (elementsDiv && toggle) {
                 if (elementsDiv.classList.contains('expanded')) {
                     elementsDiv.classList.remove('expanded');
-                    btn.textContent = '▶';
+                    toggle.textContent = '▶';
                 } else {
                     elementsDiv.classList.add('expanded');
-                    btn.textContent = '▼';
+                    toggle.textContent = '▼';
                 }
             }
+        }
+
+        function toggleDatasetSelection(datasetId, dataSetElements) {
+            if (!dataSetElements || dataSetElements.length === 0) return;
+            
+            const allSelected = dataSetElements.every(dse => 
+                dse.dataElement && selectedDataElements.has(dse.dataElement.id)
+            );
+            
+            if (allSelected) {
+                // Deselect all elements in this dataset
+                dataSetElements.forEach(dse => {
+                    if (dse.dataElement) {
+                        selectedDataElements.delete(dse.dataElement.id);
+                    }
+                });
+            } else {
+                // Select all elements in this dataset
+                dataSetElements.forEach(dse => {
+                    if (dse.dataElement) {
+                        selectedDataElements.add(dse.dataElement.id);
+                    }
+                });
+            }
+            
+            // Re-render to update checkboxes and styling
+            renderDatasetCheckboxList(datasetsData);
+        }
+
+        function toggleDataElementSelection(elementId, parentDatasetId, allDataSetElements) {
+            if (selectedDataElements.has(elementId)) {
+                selectedDataElements.delete(elementId);
+            } else {
+                selectedDataElements.add(elementId);
+            }
+            
+            // Update the element item styling
+            const elItem = document.querySelector(`.dataset-element-item[data-id="${elementId}"]`);
+            const elCheckbox = elItem?.querySelector('.dataset-element-checkbox');
+            
+            if (elItem && elCheckbox) {
+                if (selectedDataElements.has(elementId)) {
+                    elItem.classList.add('selected');
+                    elCheckbox.checked = true;
+                } else {
+                    elItem.classList.remove('selected');
+                    elCheckbox.checked = false;
+                }
+            }
+            
+            // Update parent dataset checkbox state
+            const parentItem = document.querySelector(`.dataset-item[data-id="${parentDatasetId}"]`);
+            const parentCheckbox = parentItem?.querySelector('.dataset-checkbox');
+            
+            if (parentItem && parentCheckbox && allDataSetElements) {
+                const selectedCount = allDataSetElements.filter(dse => 
+                    dse.dataElement && selectedDataElements.has(dse.dataElement.id)
+                ).length;
+                
+                const totalCount = allDataSetElements.length;
+                
+                if (selectedCount === 0) {
+                    parentCheckbox.checked = false;
+                    parentCheckbox.indeterminate = false;
+                    parentItem.classList.remove('selected', 'parent-selected');
+                } else if (selectedCount === totalCount) {
+                    parentCheckbox.checked = true;
+                    parentCheckbox.indeterminate = false;
+                    parentItem.classList.remove('parent-selected');
+                    parentItem.classList.add('selected');
+                } else {
+                    parentCheckbox.checked = false;
+                    parentCheckbox.indeterminate = true;
+                    parentItem.classList.remove('selected');
+                    parentItem.classList.add('parent-selected');
+                }
+            }
+            
+            updateDatasetSelectionSummary();
         }
 
         function expandAllDatasets() {
             document.querySelectorAll('.dataset-elements').forEach(div => {
                 div.classList.add('expanded');
             });
-            document.querySelectorAll('.dataset-collapse-btn').forEach(btn => {
-                btn.textContent = '▼';
+            document.querySelectorAll('.dataset-toggle').forEach(toggle => {
+                if (toggle.textContent === '▶') {
+                    toggle.textContent = '▼';
+                }
             });
         }
 
@@ -2591,60 +2791,61 @@
             document.querySelectorAll('.dataset-elements').forEach(div => {
                 div.classList.remove('expanded');
             });
-            document.querySelectorAll('.dataset-collapse-btn').forEach(btn => {
-                btn.textContent = '▶';
+            document.querySelectorAll('.dataset-toggle').forEach(toggle => {
+                if (toggle.textContent === '▼') {
+                    toggle.textContent = '▶';
+                }
             });
         }
 
-        function toggleDatasetSelection(id) {
-            if (selectedDatasets.has(id)) {
-                selectedDatasets.delete(id);
-            } else {
-                selectedDatasets.add(id);
-            }
-            
-            const item = document.querySelector(`.dataset-item[data-id="${id}"]`);
-            const checkbox = item?.querySelector('.dataset-checkbox');
-            
-            if (item && checkbox) {
-                if (selectedDatasets.has(id)) {
-                    item.classList.add('selected');
-                    checkbox.checked = true;
-                } else {
-                    item.classList.remove('selected');
-                    checkbox.checked = false;
+        function selectAllDatasets() {
+            datasetsData.forEach(ds => {
+                if (ds.dataSetElements) {
+                    ds.dataSetElements.forEach(dse => {
+                        if (dse.dataElement) {
+                            selectedDataElements.add(dse.dataElement.id);
+                        }
+                    });
                 }
-            }
-            
-            updateDatasetSelectionSummary();
+            });
+            renderDatasetCheckboxList(datasetsData);
+        }
+
+        function clearAllDatasets() {
+            selectedDataElements.clear();
+            renderDatasetCheckboxList(datasetsData);
         }
 
         function updateDatasetSelectionSummary() {
             const summary = document.getElementById('datasetSelectionSummary');
             const count = document.getElementById('datasetSelectionCount');
             
-            const numSelected = selectedDatasets.size;
+            const numSelected = selectedDataElements.size;
             
             if (numSelected > 0) {
                 summary.style.display = 'block';
-                count.textContent = `${numSelected} dataset${numSelected === 1 ? '' : 's'} selected`;
+                count.textContent = `${numSelected} data element${numSelected === 1 ? '' : 's'} selected`;
             } else {
                 summary.style.display = 'none';
             }
         }
 
         function selectAllDatasets() {
-            datasetsData.forEach(ds => selectedDatasets.add(ds.id));
-            document.querySelectorAll('.dataset-checkbox').forEach(cb => cb.checked = true);
-            document.querySelectorAll('.dataset-item').forEach(item => item.classList.add('selected'));
-            updateDatasetSelectionSummary();
+            datasetsData.forEach(ds => {
+                if (ds.dataSetElements) {
+                    ds.dataSetElements.forEach(dse => {
+                        if (dse.dataElement) {
+                            selectedDataElements.add(dse.dataElement.id);
+                        }
+                    });
+                }
+            });
+            renderDatasetCheckboxList(datasetsData);
         }
 
         function clearAllDatasets() {
-            selectedDatasets.clear();
-            document.querySelectorAll('.dataset-checkbox').forEach(cb => cb.checked = false);
-            document.querySelectorAll('.dataset-item').forEach(item => item.classList.remove('selected'));
-            updateDatasetSelectionSummary();
+            selectedDataElements.clear();
+            renderDatasetCheckboxList(datasetsData);
         }
 
         function filterDatasets() {
@@ -2859,11 +3060,11 @@
         }
 
         async function executeDownloadDatasets() {
-            const selectedDatasetIds = Array.from(selectedDatasets);
+            const selectedDataElementIds = Array.from(selectedDataElements);
             const selectedOrgUnitIds = Array.from(selectedOrgUnits);
             
-            if (selectedDatasetIds.length === 0) {
-                showNotification('Please select at least one dataset', 'error');
+            if (selectedDataElementIds.length === 0) {
+                showNotification('Please select at least one data element', 'error');
                 return;
             }
             
@@ -2883,24 +3084,22 @@
             setProgress(0);
             
             try {
-                log(`📋 Fetching metadata for ${selectedDatasetIds.length} datasets...`, 'info');
+                log(`📋 Processing ${selectedDataElementIds.length} selected data elements...`, 'info');
                 setProgress(20);
                 
-                const allDataElements = new Set();
+                // Build data element map
                 const dataElementMap = {};
-                
                 datasetsData.forEach(ds => {
-                    if (selectedDatasetIds.includes(ds.id) && ds.dataSetElements) {
+                    if (ds.dataSetElements) {
                         ds.dataSetElements.forEach(dse => {
-                            if (dse.dataElement) {
-                                allDataElements.add(dse.dataElement.id);
+                            if (dse.dataElement && selectedDataElementIds.includes(dse.dataElement.id)) {
                                 dataElementMap[dse.dataElement.id] = dse.dataElement.displayName || dse.dataElement.name || dse.dataElement.id;
                             }
                         });
                     }
                 });
                 
-                log(`✅ Found ${allDataElements.size} data elements in selected datasets`, 'success');
+                log(`✅ Prepared ${Object.keys(dataElementMap).length} data elements for export`, 'success');
                 
                 const orgUnitMap = {};
                 const orgUnitHierarchy = {};
@@ -2925,9 +3124,12 @@
                 }
                 
                 log('📊 Fetching data values...', 'info');
+                log(`  Data Elements: ${selectedDataElementIds.length}`, 'info');
+                log(`  Org Units: ${selectedOrgUnitIds.length}`, 'info');
+                log(`  Period: ${period}`, 'info');
                 setProgress(60);
                 
-                const dataUrl = `${state.config.instanceUrl}/api/dataValueSets.json?dataSet=${selectedDatasetIds.join(',')}&orgUnit=${selectedOrgUnitIds.join(',')}&${period}`;
+                const dataUrl = `${state.config.instanceUrl}/api/dataValueSets.json?dataElement=${selectedDataElementIds.join(',')}&orgUnit=${selectedOrgUnitIds.join(',')}&${period}`;
                 const dataResponse = await fetchWithAuth(dataUrl);
                 
                 if (!dataResponse.ok) throw new Error('Failed to fetch data values');
@@ -2940,6 +3142,10 @@
                 
                 if (numValues === 0) {
                     showNotification('No data values found for selected criteria', 'info');
+                    log('ℹ️  No data found. This could mean:', 'info');
+                    log('   • No data entered for this period', 'info');
+                    log('   • Selected org units have no data', 'info');
+                    log('   • Data elements are not used in this period', 'info');
                     return;
                 }
                 
@@ -2953,6 +3159,7 @@
                     cocData.categoryOptionCombos?.forEach(coc => {
                         categoryOptionComboMap[coc.id] = coc.displayName || coc.name || coc.id;
                     });
+                    log(`  Found ${Object.keys(categoryOptionComboMap).length} category combos`, 'info');
                 }
                 
                 log('📝 Converting to wide format CSV...', 'info');
@@ -2965,7 +3172,12 @@
                 link.click();
                 
                 setProgress(100);
-                log('✅ CSV download complete!', 'success');
+                log('\n═══════════════════════════════════════', 'success');
+                log('✅ DOWNLOAD COMPLETE!', 'success');
+                log('═══════════════════════════════════════', 'success');
+                log(`  📊 ${numValues} data values exported`, 'success');
+                log(`  📋 ${selectedDataElementIds.length} data elements`, 'success');
+                log(`  🏢 ${selectedOrgUnitIds.length} organisation units`, 'success');
                 showNotification('Dataset data downloaded successfully!', 'success');
                 
             } catch (error) {
